@@ -1,0 +1,28 @@
+from multiprocessing import Pool
+from collections import Counter
+import re
+from functools import reduce
+
+def mapper(line):
+    words = re.findall(r'\b\w+\b', line.lower())
+    return Counter(words)
+
+def reducer(counter1, counter2):
+    return counter1 + counter2
+
+def map_reduce(input_file):
+    with open(input_file, 'r') as f:
+        lines = f.readlines()
+
+    with Pool() as pool:
+        mapped_counts = pool.map(mapper, lines)
+        reduced_counts = reduce(reducer, mapped_counts)
+        word_count = sum(reduced_counts.values())
+        print("Total words:", word_count)
+        print("Word count:")
+        for word, count in reduced_counts.items():
+            print(f"{word}: {count}")
+
+if __name__ == "__main__":
+    input_file = "/content/haddop.txt"  # Change this to the path of your input file
+    map_reduce(input_file)

@@ -1,0 +1,44 @@
+FOR HIVE
+
+hive 
+
+create table student(rollno int,name string,dept string)
+row format delimited fields terminated by ','
+tblproperties ("skip.header.line.count"="1");
+
+load data local inpath
+'/home/cloudera/Documents/file'
+into table student
+
+hdfs dfs -put /home/cloudera/Documents/file /data1
+
+create external table exttable(rollno int,name string,dept string)
+row format delimited fields terminated by ','
+location '/data1';
+
+
+
+
+INTEGRATION BETWEEN HBASE AND HIVE
+
+FOR HBASE
+
+sudo hbase-master start
+sudo hbase-regionserver start
+
+create 'employee','details'
+
+put 'employee','1','details:name','Sahil'
+put 'employee','1','details:dept','IT'
+
+
+list //to list the tables
+
+scan 'employee' //to display the data
+
+create external table(rollno int,name string,dept string)
+stored by 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+with serdeproperties ("hbase.columns.mapping"=":key,details:name,details:dept")
+tblproperties ("hbase.table.name"="employee");
+
+
